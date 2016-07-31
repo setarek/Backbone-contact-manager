@@ -21,14 +21,34 @@ $(function(){
     //--------------
     // View
     //--------------
+    var CreateContact = Backbone.View.extend({
+      tagName: 'li',
+      template: _.template($('#contact-template').html()),
+      render: function(){
+        this.$el.html(this.template(this.model.toJSON()))
+        return this
+      }
+    })
     var appview = Backbone.View.extend({
       el: '#main',
       initialize: function(){
-        this.render();
+        this.input = this.$('#NewContact')
       },
-      render : function(){
-         this.$el.html('kofte')
+      events: {
+        'keypress #NewContact': 'createTodoOnEnter'
+      },
+      createTodoOnEnter: function(e){
+        if ( e.which !== 13 || !this.input.val().trim() ) {
+          return
+        }
+        ContactList.create(this.newAttributes())
+        this.input.val('')
+      },
+      newAttributes: function(){
+        return {
+          name: this.input.val().trim(),
+        }
       }
     })
-    var appView = new appview();
+    var appView = new appview()
 })
