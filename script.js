@@ -14,41 +14,96 @@ $(function(){
     // Collection
     //--------------
     var ContactList = Backbone.Collection.extend({
-      model: Contact,
-      localStorage: new Store("backbone-ContactList")
+      model: Contact
     })
-    var ContactList = new ContactList
+
+    var contactList = new ContactList([
+      {
+        name: 'Mehrnoosh',
+        number: '00000000000'
+      }, {
+        name: 'Mahdi',
+        number: '00000000000'
+      }
+    ])
     //--------------
     // View
     //--------------
-    var CreateContact = Backbone.View.extend({
+    var ContactView = Backbone.View.extend({
       tagName: 'li',
       template: _.template($('#contact-template').html()),
-      render: function(){
+
+      initialize () {
+        this.model.on('change', this.render.bind(this))
+        this.render()
+      },
+
+      render () {
         this.$el.html(this.template(this.model.toJSON()))
         return this
       }
     })
-    var appview = Backbone.View.extend({
-      el: '#main',
-      initialize: function(){
-        this.input = this.$('#NewContact')
+
+    var ContactListView = Backbone.View.extend({
+      template: _.template($('#contact-list').html()),
+      initialize ({ model }) {
+        this.model = model
+        this.model.on('reset', this.addAll.bind(this))
+        this.model.on('add', this.addOne.bind(this))
+        // this.model.fetch()
+        this.render()
       },
-      events: {
-        'keypress #NewContact': 'createTodoOnEnter'
+
+      render () {
+        this.el.innerHTML = this.template()
+        this.addAll()
+        return this
       },
-      createTodoOnEnter: function(e){
-        if ( e.which !== 13 || !this.input.val().trim() ) {
-          return
-        }
-        ContactList.create(this.newAttributes())
-        this.input.val('')
+
+      addOne (model) {
+        this.$el.find('#contact').append(new ContactView({
+          model: model
+        }).$el)
       },
-      newAttributes: function(){
-        return {
-          name: this.input.val().trim(),
-        }
+
+      addAll (model) {
+        this.$el.find('#contact').html('')
+        this.model.each((model) => {
+          this.addOne(model)
+        })
       }
     })
-    var appView = new appview()
+
+    var AppView = Backbone.View.extend({
+      el: '#contact-wrapper',
+      template: _.template($('#main-template').html()),
+      events: {
+        'keypress #new-contact': 'createTodoOnEnter'
+      },
+
+      initialize () {
+        this.render()
+        return this
+      },
+
+      createTodoOnEnter (e) {
+        if ( e.which === 13 && this.input.val().trim().length > 0 ) {
+          contactList.add({
+            name: this.input.val().trim()
+          })
+          this.input.val('')
+        }
+      },
+
+      render () {
+        this.$el.html(this.template())
+        this.$el.find('#main').html(new ContactListView({
+          model: contactList
+        }).$el)
+
+        this.input = this.$el.find('#new-contact')
+      }
+    })
+
+    var appView = new AppView()
 })

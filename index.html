@@ -16,22 +16,24 @@
   <!-- Your HTML -->
   <!-- ========= -->
 
-  <section id="ContactWrapper">
-    <header id="header">
-      <h1>Contact List</h1>
-      <input id="NewContact" placeholder="add a new contact">
-    </header>
-    <section id="main">
-      <ul id="Contact"></ul>
-    </section>
-  </section>
+  <section id="contact-wrapper"></section>
 
   <!-- Templates -->
+  <script type="text/template" id="main-template">
+    <header id="header">
+      <h1>Contact List</h1>
+      <input id="new-contact" placeholder="add a new contact">
+    </header>
+    <section id="main"></section>
+  </script>
   <script type="text/template" id="contact-template">
     <div>
-      <label><%- name %></label>
+      <li><%- name %></li>
     </div>
-  </script>  
+  </script>
+  <script type="text/template" id="contact-list">
+    <ul id="contact"></ul>
+  </script>
   <!-- End of Templates -->
   <!-- ========= -->
   <!-- Libraries -->
